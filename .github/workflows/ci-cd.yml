@@ -212,6 +212,7 @@ jobs:
       - test
 
     if: github.event_name == 'push' && github.ref == 'refs/heads/chore/ci-cd'
+
     environment:
       name: production
 
@@ -258,8 +259,12 @@ jobs:
             echo "Missing RENDER_BACKEND_DEPLOY_HOOK secret"
             exit 1
           }
-          curl --fail --silent --show-error \
-            -X POST "$RENDER_DEPLOY_HOOK"
+
+          IMAGE_URL="ghcr.io/${GITHUB_REPOSITORY,,}/backend:${GITHUB_SHA}"
+
+          curl --fail --silent --show-error --get \
+            --data-urlencode "imgURL=$IMAGE_URL" \
+            "$RENDER_DEPLOY_HOOK"
 
       - name: Trigger Render frontend deployment
         env:
@@ -269,5 +274,9 @@ jobs:
             echo "Missing RENDER_FRONTEND_DEPLOY_HOOK secret"
             exit 1
           }
-          curl --fail --silent --show-error \
-            -X POST "$RENDER_DEPLOY_HOOK"
+
+          IMAGE_URL="ghcr.io/${GITHUB_REPOSITORY,,}/frontend:${GITHUB_SHA}"
+
+          curl --fail --silent --show-error --get \
+            --data-urlencode "imgURL=$IMAGE_URL" \
+            "$RENDER_DEPLOY_HOOK"
