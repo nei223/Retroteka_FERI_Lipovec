@@ -211,8 +211,7 @@ jobs:
       - build
       - test
 
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
+    if: github.event_name == 'push' && github.ref == 'refs/heads/chore/ci-cd'
     environment:
       name: production
 
