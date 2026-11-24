@@ -175,6 +175,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Backend tests
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
@@ -186,19 +187,44 @@ jobs:
         working-directory: backend
         run: pip install -r requirements-dev.txt
 
-      - name: Run tests with coverage
+      - name: Run backend tests with coverage
         working-directory: backend
         run: |
           pytest --cov=. \
             --cov-report=xml:coverage.xml \
             --cov-report=term
 
-      - name: Upload coverage report
+      - name: Upload backend coverage report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
+          name: backend-coverage-report
           path: backend/coverage.xml
+          retention-days: 7
+          if-no-files-found: ignore
+
+      # Frontend tests
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run frontend tests with coverage
+        working-directory: frontend
+        run: npm run test:coverage
+
+      - name: Upload frontend coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage-report
+          path: frontend/coverage/lcov.info
           retention-days: 7
           if-no-files-found: ignore
 
